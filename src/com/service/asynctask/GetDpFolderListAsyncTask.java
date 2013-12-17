@@ -41,11 +41,11 @@ public class GetDpFolderListAsyncTask
 			e.printStackTrace();
 		}
 		
-		recursivelyFolderSearch( root_entries );
+		recursivelyDropBoxFolderSearch( root_entries );
 		return dpDirectories;
 	}
 	
-	private void recursivelyFolderSearch( List<Entry> root_entries ){
+	private void recursivelyDropBoxFolderSearch( List<Entry> root_entries ){
 		for ( Entry temp : root_entries ){
 			if ( temp.isDir ){
 				Entry lvl1_entry;
@@ -54,7 +54,7 @@ public class GetDpFolderListAsyncTask
 					lvl1_entry = this.mApi.metadata( temp.path + "/", 100, null, true, null );
 					lvl1_entries = lvl1_entry.contents;
 					dpDirectories.put( temp.fileName(), lvl1_entries );
-					recursivelyFolderSearch( lvl1_entries );
+					recursivelyDropBoxFolderSearch( lvl1_entries );
 				} catch (DropboxException e) {
 					e.printStackTrace();
 				}

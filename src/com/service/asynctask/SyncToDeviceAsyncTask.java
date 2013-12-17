@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.Entry;
-
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
+
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.Entry;
+import com.dropbox.client2.exception.DropboxException;
+import com.service.research.SyncToDeviceActivity;
 
 public class SyncToDeviceAsyncTask extends AsyncTask<String, Void, Void> {
 	
@@ -22,8 +25,15 @@ public class SyncToDeviceAsyncTask extends AsyncTask<String, Void, Void> {
 	private FileOutputStream mFos;
 	
 	private DropboxAPI<?> mApi;
+	
+	private Context context;
+	
+	private List<String> file_path = new ArrayList<String>();
+	
+	private List<String> folder_path = new ArrayList<String>();
 
-	public SyncToDeviceAsyncTask(DropboxAPI<?> api, HashMap<String, List<Entry>> dp_folders_list, Set<String> folders){
+	public SyncToDeviceAsyncTask(Context context, DropboxAPI<?> api, HashMap<String, List<Entry>> dp_folders_list, Set<String> folders){
+		this.context = context;
 		this.mApi = api;
 		this.dp_folders_list = dp_folders_list;
 		this.folders = folders;
@@ -31,108 +41,70 @@ public class SyncToDeviceAsyncTask extends AsyncTask<String, Void, Void> {
 	
 	@Override
 	protected Void doInBackground(String... params) {
-		
-//		Entry entries = new Entry();
-		try {
-//			entries = this.mApi.metadata( "/", 100, null, true, null );
-//		
-//		
-//		List<Entry> entry1 = new ArrayList<Entry>();
-//		if ( entries != null )
-//			entry1 = entries.contents; 
-		
-		for ( int i = 0; i < this.dp_folders_list.size(); i++ ){
-			for ( String s_temp : folders ){
-				if ( this.dp_folders_list.containsKey( s_temp ) ){
+		for ( String s_temp : folders ){
+			int times = 1;
+			for ( int i = 0; i < this.dp_folders_list.size(); i++ ){
+				if ( this.dp_folders_list.containsKey( s_temp ) && !( times > folders.size() ) ){
 					for ( int n = 0; n < this.dp_folders_list.get( s_temp ).size(); n++ ){
-						if ( this.dp_folders_list.get( s_temp ).get( n ).isDir ){
-							File direct = new File(Environment.getExternalStorageDirectory()
-									+ "/" + s_temp + "/" + this.dp_folders_list.get( s_temp ).get( n ).fileName() );
-							
-				            String cachePath="";
-			            	String alt_file_name="";
-			            	String dropbox_path = "";
-			            	
-				            if(!direct.exists())
-				            {
-				            	if(direct.mkdirs()){
-			            			if(direct.exists()) {
-			            				List<Entry> files =  new ArrayList<Entry>();
-						            	if ( this.dp_folders_list.get( s_temp ).get( n ).isDir ){
-						            		String folder_name = this.dp_folders_list.get( s_temp ).get( n ).fileName();
-						            		if ( this.dp_folders_list.get( folder_name ).get( n ).contents != null )
-						            			files = this.dp_folders_list.get( folder_name ).get( n ).contents;
-						            		else
-						            			alt_file_name = this.dp_folders_list.get( folder_name ).get( n ).fileName();
-						            	}
-						            	else{
-						            		files = this.dp_folders_list.get( s_temp ).get( n ).contents;
-						            	}
-				                		if ( files != null && !files.isEmpty() ){
-					                		for ( int j = 0; j < files.size() ; j++ )
-						                		cachePath = Environment.getExternalStorageDirectory()
-						                				+ "/" + s_temp
-						                				+ "/" + this.dp_folders_list.get( s_temp ).get( n ).fileName() 
-						                				+ "/" + files.get( j ).fileName();
-					                		dropbox_path = this.dp_folders_list.get( s_temp ).get( n ).path;
-				                		}
-				                		else{
-						            		cachePath = Environment.getExternalStorageDirectory()
-				                				+ "/" + s_temp
-				                				+ "/" + this.dp_folders_list.get( s_temp ).get( n ).fileName() 
-				                				+ "/" + alt_file_name;
-						            		dropbox_path = this.dp_folders_list.get( s_temp ).get( n ).path;
-				                		}
-			            			}
-			                	}
-				            }
-				            else{
-				            	List<Entry> files = new ArrayList<Entry>();
-				            	if ( this.dp_folders_list.get( s_temp ).get( n ).isDir ){
-				            		String folder_name = this.dp_folders_list.get( s_temp ).get( n ).fileName();
-				            		if ( this.dp_folders_list.get( folder_name ).get( n ).contents != null )
-				            			files = this.dp_folders_list.get( folder_name ).get( n ).contents;
-				            		else
-				            			alt_file_name = this.dp_folders_list.get( folder_name ).get( n ).fileName();
-				            	}
-				            	else{
-				            		files = this.dp_folders_list.get( s_temp ).get( n ).contents;
-				            	}
-				            	if ( files != null && !files.isEmpty() ){
-			                		for ( int j = 0; j < files.size() ; j++ )
-				                		cachePath = Environment.getExternalStorageDirectory()
-				                				+ "/" + s_temp
-				                				+ "/" + this.dp_folders_list.get( s_temp ).get( n ).fileName() 
-				                				+ "/" + files.get( j ).fileName();
-			                		dropbox_path = this.dp_folders_list.get( s_temp ).get( n ).path;
-				            	}
-				            	else{
-				            		cachePath = Environment.getExternalStorageDirectory()
-		                				+ "/" + s_temp
-		                				+ "/" + this.dp_folders_list.get( s_temp ).get( n ).fileName() 
-		                				+ "/" + alt_file_name;
-				            		dropbox_path = this.dp_folders_list.get( s_temp ).get( n ).path;
-				            	}
-				            }
-				            
-				            
-			                mFos = new FileOutputStream(cachePath);
-				            
-				            
-				            mApi.getFile(dropbox_path, null, mFos, null);
-				            break;
-						}
+						this.recursivelyDropBoxFolderSearch( this.dp_folders_list.get( s_temp ) );
 					}
+					times++;
 				}
 				else
 					break;
+			} 
+		}
+		try{
+			for ( int i = 0; i < file_path.size(); i++ ){
+				File file = new File(Environment.getExternalStorageDirectory() 
+						+ folder_path.get( i ) );
+				if(!file.exists())
+	            {
+	            	if(file.mkdirs()){
+            			if(file.exists()) {
+            				mFos = new FileOutputStream( Environment.getExternalStorageDirectory()
+	                										+ "/" + file_path.get( i ) );
+            				mApi.getFile( file_path.get( i ), null, mFos, null );
+            			}
+	            	}
+	            }
+				else{
+					mFos = new FileOutputStream( Environment.getExternalStorageDirectory()
+							+ "/" + file_path.get( i ) );
+					mApi.getFile( file_path.get( i ), null, mFos, null );
+				}
+					
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private void recursivelyDropBoxFolderSearch( List<Entry> root_entries ){
+		for ( Entry temp : root_entries ){
+			if ( temp.isDir ){
+				Entry lvl1_entry;
+				List<Entry> lvl1_entries = new ArrayList<DropboxAPI.Entry>();
+				try {
+					lvl1_entry = this.mApi.metadata( temp.path + "/", 100, null, true, null );
+					lvl1_entries = lvl1_entry.contents;
+					recursivelyDropBoxFolderSearch( lvl1_entries );
+				} catch (DropboxException e) {
+					e.printStackTrace();
+				}
+			}
+			else{
+				folder_path.add( temp.parentPath() );
+				file_path.add( temp.path );
 			}
 		}
-		} catch ( Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} 
-		return null;
+	}
+	
+	@Override
+	protected void onPostExecute(Void result) {
+		super.onPostExecute(result);
+		( (SyncToDeviceActivity)this.context ).SyncToDeviceAsyncTaskSucceed();
 	}
 
 }

@@ -9,5 +9,11 @@
     <string name="sync_storage">Sync To Device</string>
     <string name="auto_sync">Sync In Background</string>
     <string name="sync_to_cloud">Sync To Cloud</string>
+	<string name="get_dropbox_list">Loading Dropbox folders</string>
+	<string name="download_file">Downloading Files</string>
+	<string-array name="dropbox_state">
+	    <item>Link with Dropbox</item>
+	    <item>Unlink from Dropbox</item>
+	</string-array>
 	
 </resources>

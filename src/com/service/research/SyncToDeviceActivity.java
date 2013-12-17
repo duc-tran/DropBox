@@ -1,7 +1,5 @@
 package com.service.research;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,7 +11,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -36,8 +33,6 @@ public class SyncToDeviceActivity
 	private HashMap<String, List<Entry>> dp_folders_list;
 	
 	private ProgressDialog mDialog;
-	private boolean mCanceled;
-	private String mErrorMsg;
 	
 	private FileOutputStream mFos;
 
@@ -58,11 +53,9 @@ public class SyncToDeviceActivity
 		getfolderslist.execute();
 		
 		mDialog = new ProgressDialog( this );
-        mDialog.setMessage("Loading Files List");
+        mDialog.setMessage( this.getString( R.string.get_dropbox_list ) );
         mDialog.setButton("Cancel", new android.content.DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                mCanceled = true;
-                mErrorMsg = "Canceled";
 
                 // This will cancel the getThumbnail operation by closing
                 // its stream
@@ -101,6 +94,9 @@ public class SyncToDeviceActivity
 				folders = ( (FolderListAdapter)this.dp_list.getAdapter() ).getChecked();
 				
 				this.SyncToDevice( folders );
+				mDialog = new ProgressDialog( this );
+		        mDialog.setMessage( this.getString( R.string.download_file ) );
+		        mDialog.show();
 //				if (mFos != null) {
 //                    try {
 //                        mFos.close();
@@ -114,7 +110,12 @@ public class SyncToDeviceActivity
 	}
 	
 	private void SyncToDevice(Set<String> folders){
-		new SyncToDeviceAsyncTask( MainActivity.mApi, this.dp_folders_list, folders ).execute();
+		new SyncToDeviceAsyncTask( this, MainActivity.mApi, this.dp_folders_list, folders ).execute();
+	}
+	
+	public void SyncToDeviceAsyncTaskSucceed(){
+		Toast.makeText( this, "succeeded", Toast.LENGTH_SHORT ).show();
+		this.mDialog.dismiss();
 	}
 	
 }

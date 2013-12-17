@@ -77,7 +77,7 @@ public class FolderListAdapter
 					}
 					else
 					{
-						checked.remove( buttonView.getTag().toString() );
+						checked.remove( folders_list.get( position ).toString() );
 					}  
 					checkbox_status_list.put( position, isChecked );
 				}

@@ -19,8 +19,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         
-	    <service android:name="com.service.backgroundservice.BackUpService" android:exported="false">
-		</service>
+	    <!-- <service android:name="com.service.backgroundservice.BackUpService" android:exported="false">
+		</service> -->
 		
 	    <service
 		  android:name="com.dropbox.sync.android.DbxSyncService"
@@ -40,9 +40,9 @@
         
         <activity android:name="com.dropbox.sync.android.DbxAuthActivity" />
         
-        <activity android:name="com.service.research.UpLoadToCloudActivity" />
+        <activity android:name="com.service.research.UpLoadToCloudActivity" android:label="@string/sync_to_cloud" />
         
-        <activity android:name="com.service.research.SyncToDeviceActivity" />
+        <activity android:name="com.service.research.SyncToDeviceActivity" android:label="@string/sync_storage"/>
         
         <activity
 	      	android:name="com.dropbox.client2.android.AuthActivity"

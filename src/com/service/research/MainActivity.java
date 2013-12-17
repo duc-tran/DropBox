@@ -309,10 +309,12 @@ public class MainActivity extends Activity
 	private void setLoggedIn(boolean loggedIn) {
     	mLoggedIn = loggedIn;
     	if (loggedIn) {
-    		this.btn_Sign_In.setText("Unlink from Dropbox");
+    		this.btn_Sign_In.setText( this.getResources().getStringArray( R.array.dropbox_state )[1] );
+    		this.displayButtons( View.VISIBLE );
 //            mDisplay.setVisibility(View.VISIBLE);
     	} else{
-    		this.btn_Sign_In.setText("Link with Dropbox");
+    		this.btn_Sign_In.setText( this.getResources().getStringArray( R.array.dropbox_state )[0] );
+    		this.displayButtons( View.GONE );
 //            mDisplay.setVisibility(View.GONE);
 //            mImage.setImageDrawable(null);
     	}
@@ -342,4 +344,8 @@ public class MainActivity extends Activity
 	     }
 	 }
 
+	 private void displayButtons(int state){
+ 		this.btn_Back_Up.setVisibility( state );
+ 		this.btn_Sync.setVisibility( state );
+	 }
 }
