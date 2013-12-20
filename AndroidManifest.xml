@@ -29,7 +29,7 @@
 		  android:label="Dropbox Sync" />
 		 
         <activity
-            android:name="com.service.research.MainActivity"
+            android:name="com.service.activities.HomeScreen"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,9 +40,9 @@
         
         <activity android:name="com.dropbox.sync.android.DbxAuthActivity" />
         
-        <activity android:name="com.service.research.UpLoadToCloudActivity" android:label="@string/sync_to_cloud" />
+        <activity android:name="com.service.activities.UpLoadToDropboxActivity" android:label="@string/sync_to_cloud" />
         
-        <activity android:name="com.service.research.SyncToDeviceActivity" android:label="@string/sync_storage"/>
+        <activity android:name="com.service.activities.SyncToDeviceActivity" android:label="@string/sync_storage"/>
         
         <activity
 	      	android:name="com.dropbox.client2.android.AuthActivity"

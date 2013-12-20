@@ -14,7 +14,7 @@ import android.os.Environment;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.exception.DropboxException;
-import com.service.research.SyncToDeviceActivity;
+import com.service.activities.SyncToDeviceActivity;
 
 public class SyncToDeviceAsyncTask extends AsyncTask<String, Void, Void> {
 	
@@ -49,6 +49,9 @@ public class SyncToDeviceAsyncTask extends AsyncTask<String, Void, Void> {
 						this.recursivelyDropBoxFolderSearch( this.dp_folders_list.get( s_temp ) );
 					}
 					times++;
+				}
+				else if ( this.dp_folders_list.containsKey( "root" ) ){
+					this.recursivelyDropBoxFolderSearch( this.dp_folders_list.get( "root" ) );
 				}
 				else
 					break;
